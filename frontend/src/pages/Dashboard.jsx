@@ -2,8 +2,16 @@ import React, { useState, useEffect, useCallback } from 'react';
 import {
     Container, Grid, Paper, Typography, Box, AppBar, Toolbar,
     Button, Alert, Table, TableBody, TableCell, TableContainer,
-    TableHead, TableRow
+    TableHead, TableRow, Avatar, Chip, Tooltip, IconButton
 } from '@mui/material';
+import {
+    LogoutOutlined,
+    AdminPanelSettingsOutlined,
+    InsightsOutlined,
+    TrendingUpOutlined,
+    MapOutlined,
+    DashboardOutlined
+} from '@mui/icons-material';
 import api from '../api/axios';
 import { useAuth } from '../context/AuthContext';
 import Map from '../components/Map';
@@ -23,7 +31,6 @@ export default function Dashboard() {
     });
     const [debouncedFilters, setDebouncedFilters] = useState(filters);
 
-    // Debounce filter updates to avoid too many API calls
     const debouncedSetFilters = useCallback(
         debounce((newFilters) => {
             setDebouncedFilters(newFilters);
@@ -41,8 +48,7 @@ export default function Dashboard() {
                 const res = await api.get('/properties', { params: debouncedFilters });
                 setProperties(res.data);
             } catch (err) {
-                console.error('CRITICAL: Error fetching properties. Check if backend is reachable and CORS is configured.', err.message);
-                if (err.response) console.error('Data error:', err.response.data);
+                console.error('Error fetching properties', err.message);
             }
         };
 
@@ -53,144 +59,201 @@ export default function Dashboard() {
                     setAdminData(res.data);
                 } catch (err) {
                     console.error('Error fetching admin data', err);
-                    // Additional logging for admin data fetch errors
-                    if (err.response) {
-                        console.error('Admin data error response:', err.response.data);
-                        console.error('Admin data error status:', err.response.status);
-                    } else if (err.request) {
-                        console.error('Admin data error request:', err.request);
-                    } else {
-                        console.error('Admin data error message:', err.message);
-                    }
                 }
             }
         };
 
         fetchProperties();
         fetchAdminData();
-    }, [debouncedFilters, user?.role, user]); // Added user to dependency array for logging
+    }, [debouncedFilters, user?.role, user]);
 
     return (
-        <Box sx={{ 
-            minHeight: '100vh',
-            pb: 8
-        }}>
-            <AppBar position="sticky" sx={{ mb: 4 }}>
-                <Toolbar sx={{ justifyContent: 'space-between' }}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                        <Typography variant="h5" sx={{ 
-                            fontWeight: 700, 
-                            letterSpacing: '-0.5px',
-                            background: 'linear-gradient(135deg, #fff 0%, #94a3b8 100%)',
-                            WebkitBackgroundClip: 'text',
-                            WebkitTextFillColor: 'transparent',
-                        }}>
-                            GeoInsight Analytics
-                        </Typography>
-                    </Box>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 3 }}>
-                        <Box sx={{ textAlign: 'right', display: { xs: 'none', sm: 'block' } }}>
-                            <Typography variant="body2" sx={{ fontWeight: 600, color: 'primary.light' }}>
-                                {user?.username}
-                            </Typography>
-                            <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-                                {user?.role} Account
+        <Box sx={{ minHeight: '100vh', pb: 8, bgcolor: 'background.default' }}>
+            <AppBar position="sticky" elevation={0}>
+                <Container maxWidth="xl">
+                    <Toolbar disableGutters sx={{ justifyContent: 'space-between' }}>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                            <Box sx={{
+                                bgcolor: 'primary.main',
+                                p: 1,
+                                borderRadius: '12px',
+                                display: 'flex',
+                                boxShadow: '0 0 20px rgba(99, 102, 241, 0.4)'
+                            }}>
+                                <InsightsOutlined sx={{ color: 'white' }} />
+                            </Box>
+                            <Typography variant="h5" sx={{
+                                fontWeight: 800,
+                                letterSpacing: '-0.02em',
+                                background: 'linear-gradient(135deg, #fff 0%, #94a3b8 100%)',
+                                WebkitBackgroundClip: 'text',
+                                WebkitTextFillColor: 'transparent',
+                                display: { xs: 'none', sm: 'block' }
+                            }}>
+                                GeoInsight
                             </Typography>
                         </Box>
-                        <Button 
-                            variant="outlined" 
-                            color="primary" 
-                            onClick={logout}
-                            sx={{ borderColor: 'rgba(59, 130, 246, 0.5)' }}
-                        >
-                            Logout
-                        </Button>
-                    </Box>
-                </Toolbar>
+
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 1, sm: 3 } }}>
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                                <Box sx={{ textAlign: 'right', display: { xs: 'none', md: 'block' } }}>
+                                    <Typography variant="body2" sx={{ fontWeight: 700, color: 'text.primary' }}>
+                                        {user?.username}
+                                    </Typography>
+                                    <Chip
+                                        label={user?.role}
+                                        size="small"
+                                        color={user?.role === 'Admin' ? 'primary' : 'default'}
+                                        variant="outlined"
+                                        sx={{ height: 20, fontSize: '0.65rem', fontWeight: 800, mt: 0.5 }}
+                                    />
+                                </Box>
+                                <Avatar sx={{
+                                    bgcolor: user?.role === 'Admin' ? 'primary.main' : 'rgba(255,255,255,0.1)',
+                                    width: 40,
+                                    height: 40,
+                                    fontSize: '1rem',
+                                    fontWeight: 700,
+                                    border: '2px solid rgba(255,255,255,0.1)'
+                                }}>
+                                    {user?.username?.[0]?.toUpperCase()}
+                                </Avatar>
+                            </Box>
+                            <Tooltip title="Logout">
+                                <IconButton
+                                    onClick={logout}
+                                    sx={{
+                                        bgcolor: 'rgba(255,255,255,0.05)',
+                                        '&:hover': { bgcolor: 'rgba(239, 68, 68, 0.1)', color: 'error.main' }
+                                    }}
+                                >
+                                    <LogoutOutlined fontSize="small" />
+                                </IconButton>
+                            </Tooltip>
+                        </Box>
+                    </Toolbar>
+                </Container>
             </AppBar>
 
-            <Container maxWidth="xl">
+            <Container maxWidth="xl" sx={{ mt: 6 }}>
                 <Box sx={{ mb: 6 }}>
-                    <Typography variant="h3" sx={{ fontWeight: 700, mb: 1 }}>
-                        Real Estate Intelligence
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+                        <TrendingUpOutlined sx={{ color: 'primary.main' }} />
+                        <Typography variant="overline" sx={{ fontWeight: 800, letterSpacing: '0.1em', color: 'primary.main' }}>
+                            Market Intelligence Dashboard
+                        </Typography>
+                    </Box>
+                    <Typography variant="h2" sx={{ mb: 1 }}>
+                        Real Estate <span style={{ color: '#6366f1' }}>Intelligence</span>
                     </Typography>
-                    <Typography variant="h6" sx={{ color: 'text.secondary', fontWeight: 400 }}>
-                        Comprehensive market insights and property analytics
+                    <Typography variant="h6" sx={{ color: 'text.secondary', fontWeight: 400, maxWidth: 600 }}>
+                        Gain a competitive edge with advanced geospatial analytics and real-time market performance data.
                     </Typography>
                 </Box>
 
                 {user?.role === 'Admin' && (
                     <Alert 
+                        icon={<AdminPanelSettingsOutlined />}
                         severity="info" 
                         sx={{ 
-                            mb: 4, 
-                            borderRadius: '12px',
-                            border: '1px solid rgba(59, 130, 246, 0.2)',
-                            background: 'rgba(59, 130, 246, 0.05)',
+                            mb: 6,
+                            borderRadius: '16px',
+                            border: '1px solid rgba(99, 102, 241, 0.2)',
+                            background: 'rgba(99, 102, 241, 0.05)',
+                            '& .MuiAlert-icon': { color: 'primary.main' }
                         }}
                     >
-                        <strong>Admin Control Panel:</strong> You are viewing privileged data and system management tools.
+                        <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                            Admin Privileges Active:
+                            <span style={{ fontWeight: 400, marginLeft: '4px' }}>
+                                You have full access to proprietary market volume and regional performance data.
+                            </span>
+                        </Typography>
                     </Alert>
                 )}
 
-                <Paper sx={{ p: 3, mb: 5, borderRadius: '20px' }}>
-                    <Typography variant="h6" sx={{ mb: 3, fontWeight: 600 }}>Market Filters</Typography>
+                <Paper className="premium-card" sx={{ p: 4, mb: 6, borderRadius: '24px' }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 4 }}>
+                        <DashboardOutlined fontSize="small" sx={{ color: 'text.secondary' }} />
+                        <Typography variant="h6" sx={{ fontWeight: 700 }}>Discovery Filters</Typography>
+                    </Box>
                     <Filters filters={filters} setFilters={setFilters} />
                 </Paper>
 
-                <Grid container spacing={3}>
-                    {/* Hero Section: Map & Key Trends */}
-                    <Grid size={{ xs: 12, lg: 8 }}>
-                        <Paper sx={{ 
+                <Grid container spacing={4}>
+                    <Grid item xs={12} lg={8}>
+                        <Paper className="premium-card" sx={{
                             p: 2, 
-                            height: { xs: 500, lg: 650 }, 
+                            height: { xs: 500, lg: 700 },
                             borderRadius: '24px',
                             display: 'flex',
                             flexDirection: 'column',
                             overflow: 'hidden',
-                            boxShadow: '0 8px 32px 0 rgba(0,0,0,0.4)',
-                            border: '1px solid rgba(255,255,255,0.05)'
                         }}>
-                            <Box sx={{ p: 1, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                <Typography variant="h6" sx={{ fontWeight: 700 }}>Geospatial Distribution</Typography>
-                                <Typography variant="caption" color="text.secondary">Live Market Feed</Typography>
+                            <Box sx={{ p: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                    <MapOutlined sx={{ color: 'primary.main' }} />
+                                    <Typography variant="h6" sx={{ fontWeight: 700 }}>Geospatial Distribution</Typography>
+                                </Box>
+                                <Chip
+                                    label="Live Feed"
+                                    size="small"
+                                    sx={{
+                                        bgcolor: 'rgba(16, 185, 129, 0.1)',
+                                        color: 'secondary.main',
+                                        fontWeight: 700,
+                                        border: '1px solid rgba(16, 185, 129, 0.2)'
+                                    }}
+                                />
                             </Box>
-                            <Box sx={{ flexGrow: 1, minHeight: 0, borderRadius: '16px', overflow: 'hidden', mt: 1 }}>
+                            <Box sx={{ flexGrow: 1, minHeight: 0, borderRadius: '20px', overflow: 'hidden', m: 1, border: '1px solid rgba(255,255,255,0.05)' }}>
                                 <Map properties={properties} />
                             </Box>
                         </Paper>
                     </Grid>
 
-                    <Grid size={{ xs: 12, lg: 4 }}>
+                    <Grid item xs={12} lg={4}>
                         <Charts filters={debouncedFilters} layout="sidebar" />
                     </Grid>
 
                     {user?.role === 'Admin' && (
-                        <Grid size={12}>
-                            <Paper sx={{ p: 4, borderRadius: '24px', border: '1px solid rgba(255,255,255,0.05)' }}>
-                                <Typography variant="h5" sx={{ mb: 3, fontWeight: 700 }}>Regional Performance Benchmarks</Typography>
+                        <Grid item xs={12}>
+                            <Paper className="premium-card" sx={{ p: 4, borderRadius: '28px' }}>
+                                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 4 }}>
+                                    <Box>
+                                        <Typography variant="h5" sx={{ fontWeight: 800, mb: 0.5 }}>Regional Performance</Typography>
+                                        <Typography variant="body2" color="text.secondary">Comparative analysis of key market metrics by region</Typography>
+                                    </Box>
+                                    <Button size="small" variant="outlined" sx={{ borderRadius: '10px' }}>Export Data</Button>
+                                </Box>
                                 <TableContainer>
                                     <Table>
                                         <TableHead>
                                             <TableRow>
-                                                <TableCell sx={{ fontWeight: 700, color: 'primary.light', borderBottom: '2px solid rgba(255,255,255,0.1)' }}>REGION</TableCell>
-                                                <TableCell align="right" sx={{ fontWeight: 700, color: 'primary.light', borderBottom: '2px solid rgba(255,255,255,0.1)' }}>UNIT COUNT</TableCell>
-                                                <TableCell align="right" sx={{ fontWeight: 700, color: 'primary.light', borderBottom: '2px solid rgba(255,255,255,0.1)' }}>AVG VALUATION</TableCell>
-                                                <TableCell align="right" sx={{ fontWeight: 700, color: 'primary.light', borderBottom: '2px solid rgba(255,255,255,0.1)' }}>MARKET VOLUME</TableCell>
+                                                <TableCell>Region</TableCell>
+                                                <TableCell align="right">Active Units</TableCell>
+                                                <TableCell align="right">Avg Valuation</TableCell>
+                                                <TableCell align="right">Market Volume</TableCell>
                                             </TableRow>
                                         </TableHead>
                                         <TableBody>
                                             {adminData.map((row) => (
-                                                <TableRow key={row._id} hover sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
-                                                    <TableCell component="th" scope="row" sx={{ fontWeight: 600 }}>
-                                                        {row._id}
+                                                <TableRow key={row._id} hover>
+                                                    <TableCell component="th" scope="row">
+                                                        <Typography variant="body2" sx={{ fontWeight: 700 }}>{row._id}</Typography>
                                                     </TableCell>
-                                                    <TableCell align="right">{row.count}</TableCell>
-                                                    <TableCell align="right" sx={{ color: 'primary.light', fontWeight: 600 }}>
-                                                        ${row.avgPrice ? row.avgPrice.toLocaleString(undefined, { maximumFractionDigits: 0 }) : 'N/A'}
+                                                    <TableCell align="right">
+                                                        <Typography variant="body2" sx={{ fontWeight: 500 }}>{row.count}</Typography>
                                                     </TableCell>
-                                                    <TableCell align="right" sx={{ fontWeight: 600 }}>
-                                                        ${row.totalVolume ? row.totalVolume.toLocaleString() : 'N/A'}
+                                                    <TableCell align="right">
+                                                        <Typography variant="body2" sx={{ color: 'primary.light', fontWeight: 700 }}>
+                                                            ${row.avgPrice ? row.avgPrice.toLocaleString(undefined, { maximumFractionDigits: 0 }) : 'N/A'}
+                                                        </Typography>
+                                                    </TableCell>
+                                                    <TableCell align="right">
+                                                        <Typography variant="body2" sx={{ fontWeight: 700 }}>
+                                                            ${row.totalVolume ? row.totalVolume.toLocaleString() : 'N/A'}
+                                                        </Typography>
                                                     </TableCell>
                                                 </TableRow>
                                             ))}

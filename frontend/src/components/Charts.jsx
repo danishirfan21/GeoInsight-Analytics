@@ -1,25 +1,28 @@
 import React, { useEffect, useState } from 'react';
 import {
     LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip,
-    Legend, ResponsiveContainer, PieChart, Pie, Cell, BarChart, Bar
+    ResponsiveContainer, PieChart, Pie, Cell, AreaChart, Area
 } from 'recharts';
-import { Box, Typography, Paper, Grid } from '@mui/material';
+import { Box, Typography, Paper, Grid, Skeleton } from '@mui/material';
 import api from '../api/axios';
 
-const COLORS = ['#3b82f6', '#8b5cf6', '#10b981', '#f59e0b', '#ef4444'];
+const COLORS = ['#6366f1', '#10b981', '#f59e0b', '#ec4899', '#8b5cf6'];
 
 const CustomTooltip = ({ active, payload, label }) => {
     if (active && payload && payload.length) {
         return (
             <Box sx={{ 
-                bgcolor: 'rgba(30, 41, 59, 0.9)', 
+                bgcolor: 'rgba(15, 23, 42, 0.95)',
                 p: 2, 
                 borderRadius: '12px', 
-                border: '1px solid rgba(255,255,255,0.1)',
-                boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.3)'
+                border: '1px solid rgba(255,255,255,0.12)',
+                boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.5)',
+                backdropFilter: 'blur(10px)'
             }}>
-                <Typography variant="body2" sx={{ color: 'text.secondary', mb: 0.5 }}>{label}</Typography>
-                <Typography variant="h6" sx={{ color: 'primary.light', fontWeight: 700 }}>
+                <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600, display: 'block', mb: 0.5 }}>
+                    {label}
+                </Typography>
+                <Typography variant="body1" sx={{ color: 'primary.light', fontWeight: 800 }}>
                     {payload[0].name}: ${Number(payload[0].value).toLocaleString()}
                 </Typography>
             </Box>
@@ -31,16 +34,15 @@ const CustomTooltip = ({ active, payload, label }) => {
 export default function Charts({ filters, layout }) {
     const [priceTrends, setPriceTrends] = useState([]);
     const [typeDist, setTypeDist] = useState([]);
-    const [regionDist, setRegionDist] = useState([]);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        // ... (fetch logic remains same)
         const fetchAnalytics = async () => {
+            setLoading(true);
             try {
-                const [trendsRes, typeRes, regionRes] = await Promise.all([
+                const [trendsRes, typeRes] = await Promise.all([
                     api.get('/analytics/price-trends', { params: filters }),
-                    api.get('/analytics/property-type-distribution', { params: filters }),
-                    api.get('/analytics/region-distribution', { params: filters })
+                    api.get('/analytics/property-type-distribution', { params: filters })
                 ]);
 
                 setPriceTrends(trendsRes.data.map(item => ({
@@ -52,13 +54,10 @@ export default function Charts({ filters, layout }) {
                     name: item._id || 'Unknown',
                     count: Number(item.count) || 0
                 })));
-
-                setRegionDist(regionRes.data.map(item => ({
-                    name: item._id || 'Unknown',
-                    avgPrice: Number(item.avgPrice) || 0
-                })));
             } catch (err) {
                 console.error('Error fetching analytics', err);
+            } finally {
+                setLoading(false);
             }
         };
         fetchAnalytics();
@@ -66,28 +65,55 @@ export default function Charts({ filters, layout }) {
 
     const isSidebar = layout === 'sidebar';
 
+    if (loading) {
+        return (
+            <Grid container spacing={4}>
+                <Grid item xs={12}><Skeleton variant="rounded" height={isSidebar ? 330 : 450} sx={{ borderRadius: '24px' }} /></Grid>
+                <Grid item xs={12}><Skeleton variant="rounded" height={isSidebar ? 330 : 450} sx={{ borderRadius: '24px' }} /></Grid>
+            </Grid>
+        );
+    }
+
     return (
-        <Grid container spacing={3}>
+        <Grid container spacing={4}>
             {/* Price Trend Chart */}
-            <Grid size={12}>
-                <Paper sx={{ p: 3, height: isSidebar ? 310 : 450, borderRadius: '24px' }}>
-                    <Typography variant="subtitle1" sx={{ mb: 2, fontWeight: 700 }}>Market Price Velocity</Typography>
+            <Grid item xs={12}>
+                <Paper className="premium-card" sx={{ p: 3, height: isSidebar ? 330 : 450, borderRadius: '24px' }}>
+                    <Typography variant="subtitle1" sx={{ mb: 3, fontWeight: 700, color: 'text.primary' }}>Market Price Velocity</Typography>
                     {priceTrends.length > 0 ? (
                         <ResponsiveContainer width="100%" height="80%">
-                            <LineChart data={priceTrends}>
+                            <AreaChart data={priceTrends}>
+                                <defs>
+                                    <linearGradient id="colorPrice" x1="0" y1="0" x2="0" y2="1">
+                                        <stop offset="5%" stopColor="#6366f1" stopOpacity={0.3}/>
+                                        <stop offset="95%" stopColor="#6366f1" stopOpacity={0}/>
+                                    </linearGradient>
+                                </defs>
                                 <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
-                                <XAxis dataKey="name" hide={isSidebar} />
-                                <YAxis hide={isSidebar} />
+                                <XAxis
+                                    dataKey="name"
+                                    hide={isSidebar}
+                                    axisLine={false}
+                                    tickLine={false}
+                                    tick={{ fill: '#64748b', fontSize: 12 }}
+                                />
+                                <YAxis
+                                    hide={isSidebar}
+                                    axisLine={false}
+                                    tickLine={false}
+                                    tick={{ fill: '#64748b', fontSize: 12 }}
+                                />
                                 <Tooltip content={<CustomTooltip />} />
-                                <Line 
+                                <Area
                                     type="monotone" 
                                     dataKey="avgPrice" 
-                                    stroke="#3b82f6" 
+                                    stroke="#6366f1"
                                     strokeWidth={3} 
-                                    dot={!isSidebar} 
+                                    fillOpacity={1}
+                                    fill="url(#colorPrice)"
                                     name="Avg Price" 
                                 />
-                            </LineChart>
+                            </AreaChart>
                         </ResponsiveContainer>
                     ) : (
                         <Box sx={{ height: '80%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -98,9 +124,9 @@ export default function Charts({ filters, layout }) {
             </Grid>
 
             {/* Distribution Chart */}
-            <Grid size={12}>
-                <Paper sx={{ p: 3, height: isSidebar ? 310 : 450, borderRadius: '24px' }}>
-                    <Typography variant="subtitle1" sx={{ mb: 2, fontWeight: 700 }}>Portfolio Composition</Typography>
+            <Grid item xs={12}>
+                <Paper className="premium-card" sx={{ p: 3, height: isSidebar ? 330 : 450, borderRadius: '24px' }}>
+                    <Typography variant="subtitle1" sx={{ mb: 3, fontWeight: 700, color: 'text.primary' }}>Portfolio Composition</Typography>
                     {typeDist.length > 0 ? (
                         <ResponsiveContainer width="100%" height="80%">
                             <PieChart>
@@ -108,18 +134,18 @@ export default function Charts({ filters, layout }) {
                                     data={typeDist}
                                     cx="50%"
                                     cy="50%"
-                                    innerRadius={isSidebar ? 40 : 80}
-                                    outerRadius={isSidebar ? 60 : 120}
-                                    paddingAngle={5}
+                                    innerRadius={isSidebar ? 60 : 100}
+                                    outerRadius={isSidebar ? 85 : 140}
+                                    paddingAngle={8}
                                     dataKey="count"
                                     nameKey="name"
+                                    stroke="none"
                                 >
                                     {typeDist.map((entry, index) => (
                                         <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                                     ))}
                                 </Pie>
                                 <Tooltip />
-                                {!isSidebar && <Legend verticalAlign="bottom" height={36} />}
                             </PieChart>
                         </ResponsiveContainer>
                     ) : (
@@ -129,27 +155,6 @@ export default function Charts({ filters, layout }) {
                     )}
                 </Paper>
             </Grid>
-
-            {/* Region Chart if NOT sidebar (or we can add more charts here) */}
-            {!isSidebar && (
-                <Grid size={12}>
-                    <Paper sx={{ p: 4, height: 400, borderRadius: '24px' }}>
-                        <Typography variant="h6" sx={{ mb: 4, fontWeight: 700 }}>Regional Valuations (Avg USD)</Typography>
-                        <ResponsiveContainer width="100%" height="85%">
-                            <BarChart data={regionDist} barSize={60}>
-                                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
-                                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#94a3b8' }} />
-                                <Tooltip content={<CustomTooltip />} />
-                                <Bar dataKey="avgPrice" radius={[10, 10, 0, 0]}>
-                                    {regionDist.map((entry, index) => (
-                                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                                    ))}
-                                </Bar>
-                            </BarChart>
-                        </ResponsiveContainer>
-                    </Paper>
-                </Grid>
-            )}
         </Grid>
     );
 }
