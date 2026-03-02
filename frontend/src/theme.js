@@ -59,6 +59,45 @@ const theme = createTheme({
           '&::-webkit-scrollbar-thumb:hover, & *::-webkit-scrollbar-thumb:hover': {
             backgroundColor: '#475569',
           },
+          // Fix for browser autofill background
+          'input:-webkit-autofill': {
+            WebkitBoxShadow: '0 0 0 100px #0f172a inset !important',
+            WebkitTextFillColor: '#f8fafc !important',
+            caretColor: '#f8fafc',
+          },
+          'input:-webkit-autofill:hover': {
+            WebkitBoxShadow: '0 0 0 100px #0f172a inset !important',
+          },
+          'input:-webkit-autofill:focus': {
+            WebkitBoxShadow: '0 0 0 100px #0f172a inset !important',
+          },
+          'input:-webkit-autofill:active': {
+            WebkitBoxShadow: '0 0 0 100px #0f172a inset !important',
+          },
+        },
+      },
+    },
+    MuiAlert: {
+      styleOverrides: {
+        root: {
+          borderRadius: 12,
+          fontWeight: 500,
+        },
+        filledError: {
+          background: 'rgba(239, 68, 68, 0.1)',
+          color: '#fca5a5',
+          border: '1px solid rgba(239, 68, 68, 0.2)',
+          '& .MuiAlert-icon': {
+            color: '#ef4444',
+          },
+        },
+        standardError: {
+          backgroundColor: 'rgba(239, 68, 68, 0.1)',
+          color: '#f8fafc',
+          border: '1px solid rgba(239, 68, 68, 0.2)',
+          '& .MuiAlert-icon': {
+            color: '#ef4444',
+          },
         },
       },
     },
@@ -104,19 +143,35 @@ const theme = createTheme({
     MuiTextField: {
       styleOverrides: {
         root: {
+          '& .MuiInputBase-input': {
+            color: '#f8fafc',
+            '&::placeholder': {
+              color: '#94a3b8',
+              opacity: 1,
+            },
+          },
+          '& .MuiInputLabel-root': {
+            color: '#94a3b8',
+            '&.Mui-focused': {
+              color: '#818cf8',
+            },
+          },
           '& .MuiOutlinedInput-root': {
             borderRadius: 12,
-            transition: 'all 0.2s ease-in-out',
-            backgroundColor: 'rgba(15, 23, 42, 0.3)',
+            transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+            backgroundColor: 'rgba(15, 23, 42, 0.5)',
             '& fieldset': {
               borderColor: 'rgba(255, 255, 255, 0.1)',
             },
             '&:hover fieldset': {
               borderColor: 'rgba(99, 102, 241, 0.5)',
             },
-            '&.Mui-focused fieldset': {
-              borderColor: '#6366f1',
-              borderWidth: '2px',
+            '&.Mui-focused': {
+              backgroundColor: 'rgba(15, 23, 42, 0.8)',
+              '& fieldset': {
+                borderColor: '#6366f1',
+                borderWidth: '2px',
+              },
             },
           },
         },
