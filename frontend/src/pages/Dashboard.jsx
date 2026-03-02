@@ -138,44 +138,50 @@ export default function Dashboard() {
                     <Filters filters={filters} setFilters={setFilters} />
                 </Paper>
 
-                <Grid container spacing={4}>
-                    <Grid size={12}>
+                <Grid container spacing={3}>
+                    {/* Hero Section: Map & Key Trends */}
+                    <Grid size={{ xs: 12, lg: 8 }}>
                         <Paper sx={{ 
-                            p: 3, 
-                            height: 600, 
+                            p: 2, 
+                            height: { xs: 500, lg: 650 }, 
                             borderRadius: '24px',
                             display: 'flex',
                             flexDirection: 'column',
-                            overflow: 'hidden'
+                            overflow: 'hidden',
+                            boxShadow: '0 8px 32px 0 rgba(0,0,0,0.4)',
+                            border: '1px solid rgba(255,255,255,0.05)'
                         }}>
-                            <Typography variant="h5" sx={{ mb: 2, fontWeight: 600 }}>Geospatial Distribution</Typography>
-                            <Box sx={{ flexGrow: 1, minHeight: 0, borderRadius: '16px', overflow: 'hidden' }}>
+                            <Box sx={{ p: 1, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                <Typography variant="h6" sx={{ fontWeight: 700 }}>Geospatial Distribution</Typography>
+                                <Typography variant="caption" color="text.secondary">Live Market Feed</Typography>
+                            </Box>
+                            <Box sx={{ flexGrow: 1, minHeight: 0, borderRadius: '16px', overflow: 'hidden', mt: 1 }}>
                                 <Map properties={properties} />
                             </Box>
                         </Paper>
                     </Grid>
 
-                    <Grid size={12}>
-                        <Charts filters={debouncedFilters} />
+                    <Grid size={{ xs: 12, lg: 4 }}>
+                        <Charts filters={debouncedFilters} layout="sidebar" />
                     </Grid>
 
                     {user?.role === 'Admin' && (
                         <Grid size={12}>
-                            <Paper sx={{ p: 4, borderRadius: '24px' }}>
-                                <Typography variant="h5" sx={{ mb: 3, fontWeight: 600 }}>Regional Performance Benchmarks</Typography>
+                            <Paper sx={{ p: 4, borderRadius: '24px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                                <Typography variant="h5" sx={{ mb: 3, fontWeight: 700 }}>Regional Performance Benchmarks</Typography>
                                 <TableContainer>
                                     <Table>
                                         <TableHead>
                                             <TableRow>
-                                                <TableCell sx={{ fontWeight: 700, color: 'text.secondary' }}>REGION</TableCell>
-                                                <TableCell align="right" sx={{ fontWeight: 700, color: 'text.secondary' }}>COUNT</TableCell>
-                                                <TableCell align="right" sx={{ fontWeight: 700, color: 'text.secondary' }}>AVG PRICE</TableCell>
-                                                <TableCell align="right" sx={{ fontWeight: 700, color: 'text.secondary' }}>TOTAL VOLUME</TableCell>
+                                                <TableCell sx={{ fontWeight: 700, color: 'primary.light', borderBottom: '2px solid rgba(255,255,255,0.1)' }}>REGION</TableCell>
+                                                <TableCell align="right" sx={{ fontWeight: 700, color: 'primary.light', borderBottom: '2px solid rgba(255,255,255,0.1)' }}>UNIT COUNT</TableCell>
+                                                <TableCell align="right" sx={{ fontWeight: 700, color: 'primary.light', borderBottom: '2px solid rgba(255,255,255,0.1)' }}>AVG VALUATION</TableCell>
+                                                <TableCell align="right" sx={{ fontWeight: 700, color: 'primary.light', borderBottom: '2px solid rgba(255,255,255,0.1)' }}>MARKET VOLUME</TableCell>
                                             </TableRow>
                                         </TableHead>
                                         <TableBody>
                                             {adminData.map((row) => (
-                                                <TableRow key={row._id} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
+                                                <TableRow key={row._id} hover sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
                                                     <TableCell component="th" scope="row" sx={{ fontWeight: 600 }}>
                                                         {row._id}
                                                     </TableCell>
@@ -188,13 +194,6 @@ export default function Dashboard() {
                                                     </TableCell>
                                                 </TableRow>
                                             ))}
-                                            {adminData.length === 0 && (
-                                                <TableRow>
-                                                    <TableCell colSpan={4} align="center" sx={{ py: 4, color: 'text.secondary' }}>
-                                                        No performance data found for selected filters
-                                                    </TableCell>
-                                                </TableRow>
-                                            )}
                                         </TableBody>
                                     </Table>
                                 </TableContainer>

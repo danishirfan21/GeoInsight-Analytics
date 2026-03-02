@@ -8,7 +8,7 @@ export default function Filters({ filters, setFilters }) {
 
     return (
         <Box sx={{ mb: 2 }}>
-            <Grid container spacing={4}>
+            <Grid container spacing={2}>
                 <Grid size={{ xs: 12, sm: 6, md: 3 }}>
                     <TextField
                         fullWidth
@@ -17,12 +17,9 @@ export default function Filters({ filters, setFilters }) {
                         name="region"
                         value={filters.region}
                         onChange={handleChange}
-                        variant="standard"
-                        InputProps={{ disableUnderline: false }}
-                        sx={{ 
-                            '& .MuiInput-root': { py: 1 },
-                            '& .MuiInputLabel-root': { fontWeight: 600, color: 'text.secondary' }
-                        }}
+                        variant="outlined"
+                        size="small"
+                        sx={{ bgcolor: 'rgba(255,255,255,0.03)' }}
                     >
                         <MenuItem value="">All Regions</MenuItem>
                         <MenuItem value="North">North</MenuItem>
@@ -40,11 +37,9 @@ export default function Filters({ filters, setFilters }) {
                         name="type"
                         value={filters.type}
                         onChange={handleChange}
-                        variant="standard"
-                        sx={{ 
-                            '& .MuiInput-root': { py: 1 },
-                            '& .MuiInputLabel-root': { fontWeight: 600, color: 'text.secondary' }
-                        }}
+                        variant="outlined"
+                        size="small"
+                        sx={{ bgcolor: 'rgba(255,255,255,0.03)' }}
                     >
                         <MenuItem value="">All Types</MenuItem>
                         <MenuItem value="Apartment">Apartment</MenuItem>
@@ -53,34 +48,30 @@ export default function Filters({ filters, setFilters }) {
                         <MenuItem value="Townhouse">Townhouse</MenuItem>
                     </TextField>
                 </Grid>
-                <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+                <Grid size={{ xs: 12, sm: 12, md: 3 }}>
                     <TextField
                         fullWidth
-                        label="Price Floor ($)"
+                        label="Min Price ($)"
                         name="minPrice"
                         type="number"
                         value={filters.minPrice}
                         onChange={handleChange}
-                        variant="standard"
-                        sx={{ 
-                            '& .MuiInput-root': { py: 1 },
-                            '& .MuiInputLabel-root': { fontWeight: 600, color: 'text.secondary' }
-                        }}
+                        variant="outlined"
+                        size="small"
+                        sx={{ bgcolor: 'rgba(255,255,255,0.03)' }}
                     />
                 </Grid>
-                <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+                <Grid size={{ xs: 12, sm: 12, md: 3 }}>
                     <TextField
                         fullWidth
-                        label="Price Ceiling ($)"
+                        label="Max Price ($)"
                         name="maxPrice"
                         type="number"
                         value={filters.maxPrice}
                         onChange={handleChange}
-                        variant="standard"
-                        sx={{ 
-                            '& .MuiInput-root': { py: 1 },
-                            '& .MuiInputLabel-root': { fontWeight: 600, color: 'text.secondary' }
-                        }}
+                        variant="outlined"
+                        size="small"
+                        sx={{ bgcolor: 'rgba(255,255,255,0.03)' }}
                     />
                 </Grid>
             </Grid>

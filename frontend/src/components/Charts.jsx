@@ -28,12 +28,13 @@ const CustomTooltip = ({ active, payload, label }) => {
     return null;
 };
 
-export default function Charts({ filters }) {
+export default function Charts({ filters, layout }) {
     const [priceTrends, setPriceTrends] = useState([]);
     const [typeDist, setTypeDist] = useState([]);
     const [regionDist, setRegionDist] = useState([]);
 
     useEffect(() => {
+        // ... (fetch logic remains same)
         const fetchAnalytics = async () => {
             try {
                 const [trendsRes, typeRes, regionRes] = await Promise.all([
@@ -63,93 +64,92 @@ export default function Charts({ filters }) {
         fetchAnalytics();
     }, [filters]);
 
+    const isSidebar = layout === 'sidebar';
+
     return (
-        <Grid container spacing={4}>
-            <Grid size={{ xs: 12, lg: 7 }}>
-                <Paper sx={{ p: 4, height: 450, borderRadius: '24px' }}>
-                    <Typography variant="h6" sx={{ mb: 4, fontWeight: 600 }}>Market Price Velocity</Typography>
+        <Grid container spacing={3}>
+            {/* Price Trend Chart */}
+            <Grid size={12}>
+                <Paper sx={{ p: 3, height: isSidebar ? 310 : 450, borderRadius: '24px' }}>
+                    <Typography variant="subtitle1" sx={{ mb: 2, fontWeight: 700 }}>Market Price Velocity</Typography>
                     {priceTrends.length > 0 ? (
-                        <ResponsiveContainer width="100%" height="85%">
+                        <ResponsiveContainer width="100%" height="80%">
                             <LineChart data={priceTrends}>
                                 <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
-                                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#94a3b8' }} />
-                                <YAxis axisLine={false} tickLine={false} tick={{ fill: '#94a3b8' }} />
+                                <XAxis dataKey="name" hide={isSidebar} />
+                                <YAxis hide={isSidebar} />
                                 <Tooltip content={<CustomTooltip />} />
                                 <Line 
                                     type="monotone" 
                                     dataKey="avgPrice" 
                                     stroke="#3b82f6" 
-                                    strokeWidth={4} 
-                                    dot={{ r: 6, fill: '#3b82f6', strokeWidth: 2, stroke: '#fff' }} 
-                                    activeDot={{ r: 8, strokeWidth: 0 }} 
+                                    strokeWidth={3} 
+                                    dot={!isSidebar} 
                                     name="Avg Price" 
                                 />
                             </LineChart>
                         </ResponsiveContainer>
                     ) : (
-                        <Box display="flex" justifyContent="center" alignItems="center" height="85%">
-                            <Typography color="textSecondary">No trend data available</Typography>
+                        <Box sx={{ height: '80%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            <Typography variant="body2" color="text.secondary">Insufficient trend data</Typography>
                         </Box>
                     )}
                 </Paper>
             </Grid>
-            <Grid size={{ xs: 12, lg: 5 }}>
-                <Paper sx={{ p: 4, height: 450, borderRadius: '24px' }}>
-                    <Typography variant="h6" sx={{ mb: 4, fontWeight: 600 }}>Portfolio Composition</Typography>
+
+            {/* Distribution Chart */}
+            <Grid size={12}>
+                <Paper sx={{ p: 3, height: isSidebar ? 310 : 450, borderRadius: '24px' }}>
+                    <Typography variant="subtitle1" sx={{ mb: 2, fontWeight: 700 }}>Portfolio Composition</Typography>
                     {typeDist.length > 0 ? (
-                        <ResponsiveContainer width="100%" height="85%">
+                        <ResponsiveContainer width="100%" height="80%">
                             <PieChart>
                                 <Pie
                                     data={typeDist}
                                     cx="50%"
-                                    cy="45%"
-                                    innerRadius={80}
-                                    outerRadius={120}
-                                    paddingAngle={8}
+                                    cy="50%"
+                                    innerRadius={isSidebar ? 40 : 80}
+                                    outerRadius={isSidebar ? 60 : 120}
+                                    paddingAngle={5}
                                     dataKey="count"
                                     nameKey="name"
-                                    animationBegin={0}
-                                    animationDuration={1500}
                                 >
                                     {typeDist.map((entry, index) => (
-                                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} strokeWidth={0} />
+                                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                                     ))}
                                 </Pie>
                                 <Tooltip />
-                                <Legend verticalAlign="bottom" height={36} />
+                                {!isSidebar && <Legend verticalAlign="bottom" height={36} />}
                             </PieChart>
                         </ResponsiveContainer>
                     ) : (
-                        <Box display="flex" justifyContent="center" alignItems="center" height="85%">
-                            <Typography color="textSecondary">No composition data</Typography>
+                        <Box sx={{ height: '80%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            <Typography variant="body2" color="text.secondary">No composition data</Typography>
                         </Box>
                     )}
                 </Paper>
             </Grid>
-            <Grid size={12}>
-                <Paper sx={{ p: 4, height: 400, borderRadius: '24px' }}>
-                    <Typography variant="h6" sx={{ mb: 4, fontWeight: 600 }}>Regional Valuations (Avg USD)</Typography>
-                    {regionDist.length > 0 ? (
+
+            {/* Region Chart if NOT sidebar (or we can add more charts here) */}
+            {!isSidebar && (
+                <Grid size={12}>
+                    <Paper sx={{ p: 4, height: 400, borderRadius: '24px' }}>
+                        <Typography variant="h6" sx={{ mb: 4, fontWeight: 700 }}>Regional Valuations (Avg USD)</Typography>
                         <ResponsiveContainer width="100%" height="85%">
                             <BarChart data={regionDist} barSize={60}>
                                 <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
                                 <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#94a3b8' }} />
-                                <YAxis axisLine={false} tickLine={false} tick={{ fill: '#94a3b8' }} />
                                 <Tooltip content={<CustomTooltip />} />
-                                <Bar dataKey="avgPrice" radius={[10, 10, 0, 0]} name="Avg Price">
+                                <Bar dataKey="avgPrice" radius={[10, 10, 0, 0]}>
                                     {regionDist.map((entry, index) => (
                                         <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                                     ))}
                                 </Bar>
                             </BarChart>
                         </ResponsiveContainer>
-                    ) : (
-                        <Box display="flex" justifyContent="center" alignItems="center" height="85%">
-                            <Typography color="textSecondary">No regional data available</Typography>
-                        </Box>
-                    )}
-                </Paper>
-            </Grid>
+                    </Paper>
+                </Grid>
+            )}
         </Grid>
     );
 }
