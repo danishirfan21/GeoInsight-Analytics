@@ -41,7 +41,8 @@ export default function Dashboard() {
                 const res = await api.get('/properties', { params: debouncedFilters });
                 setProperties(res.data);
             } catch (err) {
-                console.error('Error fetching properties', err);
+                console.error('CRITICAL: Error fetching properties. Check if backend is reachable and CORS is configured.', err.message);
+                if (err.response) console.error('Data error:', err.response.data);
             }
         };
 
@@ -52,13 +53,22 @@ export default function Dashboard() {
                     setAdminData(res.data);
                 } catch (err) {
                     console.error('Error fetching admin data', err);
+                    // Additional logging for admin data fetch errors
+                    if (err.response) {
+                        console.error('Admin data error response:', err.response.data);
+                        console.error('Admin data error status:', err.response.status);
+                    } else if (err.request) {
+                        console.error('Admin data error request:', err.request);
+                    } else {
+                        console.error('Admin data error message:', err.message);
+                    }
                 }
             }
         };
 
         fetchProperties();
         fetchAdminData();
-    }, [debouncedFilters, user?.role]);
+    }, [debouncedFilters, user?.role, user]); // Added user to dependency array for logging
 
     return (
         <Box sx={{ 

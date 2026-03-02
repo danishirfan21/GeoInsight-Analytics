@@ -4,22 +4,26 @@ const bcrypt = require('bcryptjs');
 
 const seedData = async () => {
     // Seed Users
-    const userCount = await User.countDocuments();
-    if (userCount === 0) {
+    const adminUser = await User.findOne({ email: 'admin@geoinsight.com' });
+    if (!adminUser) {
         await User.create({
             username: 'admin',
             email: 'admin@geoinsight.com',
             password: 'admin123',
             role: 'Admin'
         });
+        console.log('Admin user seeded');
+    }
 
+    const viewerUser = await User.findOne({ email: 'viewer@geoinsight.com' });
+    if (!viewerUser) {
         await User.create({
             username: 'viewer',
             email: 'viewer@geoinsight.com',
             password: 'viewer123',
             role: 'Viewer'
         });
-        console.log('Users seeded');
+        console.log('Viewer user seeded');
     }
 
     // Seed Properties
