@@ -1,7 +1,6 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
-const { MongoMemoryServer } = require('mongodb-memory-server');
 const seedProperties = require('./scripts/seed');
 require('dotenv').config();
 
@@ -22,6 +21,7 @@ const connectDB = async () => {
             await mongoose.connect(process.env.MONGODB_URI);
             console.log('Connected to Production MongoDB');
         } else {
+            const { MongoMemoryServer } = require('mongodb-memory-server');
             mongoServer = await MongoMemoryServer.create();
             const uri = mongoServer.getUri();
             await mongoose.connect(uri);
