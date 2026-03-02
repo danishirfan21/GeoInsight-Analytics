@@ -2,9 +2,9 @@ const mongoose = require('mongoose');
 
 const PropertySchema = new mongoose.Schema({
     title: { type: String, required: true },
-    type: { type: String, enum: ['Apartment', 'House', 'Condo', 'Townhouse'], required: true },
-    price: { type: Number, required: true },
-    region: { type: String, required: true },
+    type: { type: String, required: true },
+    price: { type: Number, required: true, index: true },
+    region: { type: String, required: true, index: true },
     coordinates: {
         lat: { type: Number, required: true },
         lng: { type: Number, required: true }
@@ -13,5 +13,7 @@ const PropertySchema = new mongoose.Schema({
     description: String,
     amenities: [String]
 }, { timestamps: true });
+
+PropertySchema.index({ 'coordinates.lat': 1, 'coordinates.lng': 1 });
 
 module.exports = mongoose.model('Property', PropertySchema);
