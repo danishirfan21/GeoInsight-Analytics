@@ -17,14 +17,16 @@ L.Marker.prototype.options.icon = DefaultIcon;
 
 export default function Map({ properties }) {
     const [showHeatmap, setShowHeatmap] = useState(false);
-    const center = [51.505, -0.09]; // Default center (London area as per seed)
+    const center = [51.505, -0.09]; // London center
 
-    // Helper to determine color based on price - Premium Palette
+    console.log(`Map rendering with ${properties?.length || 0} properties`);
+
+    // Helper to determine color based on price - Realistic for Nightly Rates
     const getColor = (price) => {
-        return price > 800000 ? '#ef4444' : // Red 500
-               price > 600000 ? '#f59e0b' : // Amber 500
-               price > 400000 ? '#6366f1' : // Indigo 500
-               '#10b981'; // Emerald 500
+        return price > 500 ? '#ef4444' : // Luxury ($500+)
+               price > 250 ? '#f59e0b' : // High ($250-$500)
+               price > 100 ? '#6366f1' : // Mid ($100-$250)
+               '#10b981'; // Budget (<$100)
     };
 
     return (

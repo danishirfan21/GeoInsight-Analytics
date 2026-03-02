@@ -1,15 +1,55 @@
-import React from 'react';
-import { Box, TextField, MenuItem, Grid, InputAdornment } from '@mui/material';
+import React, { useEffect, useState } from 'react';
+import { Box, TextField, MenuItem, Grid, InputAdornment, Skeleton } from '@mui/material';
 import {
     LocationOnOutlined,
     HomeWorkOutlined,
     AttachMoneyOutlined
 } from '@mui/icons-material';
+import api from '../api/axios';
 
 export default function Filters({ filters, setFilters }) {
+    const [options, setOptions] = useState({ regions: [], types: [] });
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchOptions = async () => {
+            try {
+                // We'll create these simple endpoints or use the existing analytics data
+                const [regRes, typeRes] = await Promise.all([
+                    api.get('/analytics/region-distribution'),
+                    api.get('/analytics/property-type-distribution')
+                ]);
+                
+                setOptions({
+                    regions: regRes.data.map(r => r._id).sort(),
+                    types: typeRes.data.map(t => t._id).sort()
+                });
+            } catch (err) {
+                console.error('Error fetching filter options', err);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchOptions();
+    }, []);
+
     const handleChange = (e) => {
         setFilters({ ...filters, [e.target.name]: e.target.value });
     };
+
+    if (loading) {
+        return (
+            <Box sx={{ width: '100%' }}>
+                <Grid container spacing={3}>
+                    {[1, 2, 3, 4].map((i) => (
+                        <Grid item xs={12} sm={6} md={3} key={i}>
+                            <Skeleton variant="rounded" height={56} sx={{ borderRadius: '12px' }} />
+                        </Grid>
+                    ))}
+                </Grid>
+            </Box>
+        );
+    }
 
     return (
         <Box sx={{ width: '100%' }}>
@@ -32,18 +72,16 @@ export default function Filters({ filters, setFilters }) {
                         }}
                     >
                         <MenuItem value="">All Regions</MenuItem>
-                        <MenuItem value="North">North</MenuItem>
-                        <MenuItem value="South">South</MenuItem>
-                        <MenuItem value="East">East</MenuItem>
-                        <MenuItem value="West">West</MenuItem>
-                        <MenuItem value="Central">Central</MenuItem>
+                        {options.regions.map(region => (
+                            <MenuItem key={region} value={region}>{region}</MenuItem>
+                        ))}
                     </TextField>
                 </Grid>
                 <Grid item xs={12} sm={6} md={3}>
                     <TextField
                         fullWidth
                         select
-                        label="Property Type"
+                        label="Room Type"
                         name="type"
                         value={filters.type}
                         onChange={handleChange}
@@ -57,10 +95,9 @@ export default function Filters({ filters, setFilters }) {
                         }}
                     >
                         <MenuItem value="">All Types</MenuItem>
-                        <MenuItem value="Apartment">Apartment</MenuItem>
-                        <MenuItem value="House">House</MenuItem>
-                        <MenuItem value="Condo">Condo</MenuItem>
-                        <MenuItem value="Townhouse">Townhouse</MenuItem>
+                        {options.types.map(type => (
+                            <MenuItem key={type} value={type}>{type}</MenuItem>
+                        ))}
                     </TextField>
                 </Grid>
                 <Grid item xs={12} sm={6} md={3}>
