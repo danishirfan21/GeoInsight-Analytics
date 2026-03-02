@@ -17,17 +17,29 @@ app.use('/api/analytics', require('./routes/analytics'));
 let mongoServer;
 
 const connectDB = async () => {
-    mongoServer = await MongoMemoryServer.create();
-    const uri = mongoServer.getUri();
-    await mongoose.connect(uri);
-    console.log('Connected to In-Memory MongoDB');
+    try {
+        if (process.env.MONGODB_URI) {
+            await mongoose.connect(process.env.MONGODB_URI);
+            console.log('Connected to Production MongoDB');
+        } else {
+            mongoServer = await MongoMemoryServer.create();
+            const uri = mongoServer.getUri();
+            await mongoose.connect(uri);
+            console.log('Connected to In-Memory MongoDB (Development)');
+        }
+    } catch (err) {
+        console.error('MongoDB connection error:', err);
+        process.exit(1);
+    }
 };
 
 const startServer = async () => {
     await connectDB();
-    await seedProperties();
+    if (!process.env.MONGODB_URI) {
+        await seedProperties();
+    }
     const PORT = process.env.PORT || 5000;
-    app.listen(PORT, () => {
+    app.listen(PORT, '0.0.0.0', () => {
         console.log(`Server running on port ${PORT}`);
     });
 };
