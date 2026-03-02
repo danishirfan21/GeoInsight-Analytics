@@ -29,16 +29,27 @@ export default function Map({ properties }) {
 
     return (
         <Box sx={{ position: 'relative', height: '100%', width: '100%' }}>
-            <Box sx={{ position: 'absolute', top: 10, right: 10, zIndex: 1000, bgcolor: 'rgba(255,255,255,0.8)', p: 0.5, borderRadius: 1 }}>
+            <Box sx={{ 
+                position: 'absolute', 
+                top: 20, 
+                right: 20, 
+                zIndex: 1000, 
+                bgcolor: 'rgba(15, 23, 42, 0.8)', 
+                backdropFilter: 'blur(8px)',
+                p: '4px 12px', 
+                borderRadius: '12px',
+                border: '1px solid rgba(255,255,255,0.1)',
+                color: 'white'
+            }}>
                 <FormControlLabel
                     control={<Switch checked={showHeatmap} onChange={(e) => setShowHeatmap(e.target.checked)} size="small" />}
-                    label="Heatmap Mode"
+                    label={<Typography variant="caption" sx={{ fontWeight: 600 }}>Heatmap Analysis</Typography>}
                 />
             </Box>
-            <MapContainer center={center} zoom={11} style={{ height: '100%', width: '100%', borderRadius: '8px' }}>
+            <MapContainer center={center} zoom={11} style={{ height: '100%', width: '100%' }}>
                 <TileLayer
-                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                    url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
                 />
                 {!showHeatmap ? (
                     properties.map(property => (

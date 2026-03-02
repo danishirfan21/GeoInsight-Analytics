@@ -35,9 +35,7 @@ const connectDB = async () => {
 
 const startServer = async () => {
     await connectDB();
-    if (!process.env.MONGODB_URI) {
-        await seedProperties();
-    }
+    await seedProperties();
     const PORT = process.env.PORT || 5000;
     app.listen(PORT, '0.0.0.0', () => {
         console.log(`Server running on port ${PORT}`);

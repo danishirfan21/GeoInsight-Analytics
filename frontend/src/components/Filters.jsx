@@ -8,8 +8,8 @@ export default function Filters({ filters, setFilters }) {
 
     return (
         <Box sx={{ mb: 2 }}>
-            <Grid container spacing={3}>
-                <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+            <Grid container spacing={4}>
+                <Grid item xs={12} sm={6} md={3}>
                     <TextField
                         fullWidth
                         select
@@ -17,8 +17,12 @@ export default function Filters({ filters, setFilters }) {
                         name="region"
                         value={filters.region}
                         onChange={handleChange}
-                        variant="outlined"
-                        InputLabelProps={{ shrink: true }}
+                        variant="standard"
+                        InputProps={{ disableUnderline: false }}
+                        sx={{ 
+                            '& .MuiInput-root': { py: 1 },
+                            '& .MuiInputLabel-root': { fontWeight: 600, color: 'text.secondary' }
+                        }}
                     >
                         <MenuItem value="">All Regions</MenuItem>
                         <MenuItem value="North">North</MenuItem>
@@ -28,7 +32,7 @@ export default function Filters({ filters, setFilters }) {
                         <MenuItem value="Central">Central</MenuItem>
                     </TextField>
                 </Grid>
-                <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+                <Grid item xs={12} sm={6} md={3}>
                     <TextField
                         fullWidth
                         select
@@ -36,8 +40,11 @@ export default function Filters({ filters, setFilters }) {
                         name="type"
                         value={filters.type}
                         onChange={handleChange}
-                        variant="outlined"
-                        InputLabelProps={{ shrink: true }}
+                        variant="standard"
+                        sx={{ 
+                            '& .MuiInput-root': { py: 1 },
+                            '& .MuiInputLabel-root': { fontWeight: 600, color: 'text.secondary' }
+                        }}
                     >
                         <MenuItem value="">All Types</MenuItem>
                         <MenuItem value="Apartment">Apartment</MenuItem>
@@ -46,28 +53,34 @@ export default function Filters({ filters, setFilters }) {
                         <MenuItem value="Townhouse">Townhouse</MenuItem>
                     </TextField>
                 </Grid>
-                <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+                <Grid item xs={12} sm={6} md={3}>
                     <TextField
                         fullWidth
-                        label="Min Price"
+                        label="Price Floor ($)"
                         name="minPrice"
                         type="number"
                         value={filters.minPrice}
                         onChange={handleChange}
-                        variant="outlined"
-                        InputLabelProps={{ shrink: true }}
+                        variant="standard"
+                        sx={{ 
+                            '& .MuiInput-root': { py: 1 },
+                            '& .MuiInputLabel-root': { fontWeight: 600, color: 'text.secondary' }
+                        }}
                     />
                 </Grid>
-                <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+                <Grid item xs={12} sm={6} md={3}>
                     <TextField
                         fullWidth
-                        label="Max Price"
+                        label="Price Ceiling ($)"
                         name="maxPrice"
                         type="number"
                         value={filters.maxPrice}
                         onChange={handleChange}
-                        variant="outlined"
-                        InputLabelProps={{ shrink: true }}
+                        variant="standard"
+                        sx={{ 
+                            '& .MuiInput-root': { py: 1 },
+                            '& .MuiInputLabel-root': { fontWeight: 600, color: 'text.secondary' }
+                        }}
                     />
                 </Grid>
             </Grid>

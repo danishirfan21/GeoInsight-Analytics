@@ -61,73 +61,128 @@ export default function Dashboard() {
     }, [debouncedFilters, user?.role]);
 
     return (
-        <Box sx={{ flexGrow: 1 }}>
-            <AppBar position="static">
-                <Toolbar>
-                    <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-                        GeoInsight Analytics
-                    </Typography>
-                    <Typography sx={{ mr: 2 }}>{user?.username} ({user?.role})</Typography>
-                    <Button color="inherit" onClick={logout}>Logout</Button>
+        <Box sx={{ 
+            minHeight: '100vh',
+            pb: 8
+        }}>
+            <AppBar position="sticky" sx={{ mb: 4 }}>
+                <Toolbar sx={{ justifyContent: 'space-between' }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                        <Typography variant="h5" sx={{ 
+                            fontWeight: 700, 
+                            letterSpacing: '-0.5px',
+                            background: 'linear-gradient(135deg, #fff 0%, #94a3b8 100%)',
+                            WebkitBackgroundClip: 'text',
+                            WebkitTextFillColor: 'transparent',
+                        }}>
+                            GeoInsight Analytics
+                        </Typography>
+                    </Box>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 3 }}>
+                        <Box sx={{ textAlign: 'right', display: { xs: 'none', sm: 'block' } }}>
+                            <Typography variant="body2" sx={{ fontWeight: 600, color: 'primary.light' }}>
+                                {user?.username}
+                            </Typography>
+                            <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                                {user?.role} Account
+                            </Typography>
+                        </Box>
+                        <Button 
+                            variant="outlined" 
+                            color="primary" 
+                            onClick={logout}
+                            sx={{ borderColor: 'rgba(59, 130, 246, 0.5)' }}
+                        >
+                            Logout
+                        </Button>
+                    </Box>
                 </Toolbar>
             </AppBar>
-            <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-                <Typography variant="h4" sx={{ mb: 2 }}>Real Estate Dashboard</Typography>
+
+            <Container maxWidth="xl">
+                <Box sx={{ mb: 6 }}>
+                    <Typography variant="h3" sx={{ fontWeight: 700, mb: 1 }}>
+                        Real Estate Intelligence
+                    </Typography>
+                    <Typography variant="h6" sx={{ color: 'text.secondary', fontWeight: 400 }}>
+                        Comprehensive market insights and property analytics
+                    </Typography>
+                </Box>
 
                 {user?.role === 'Admin' && (
-                    <Alert severity="info" sx={{ mb: 3 }}>
-                        <strong>Admin Access:</strong> You have full access to all analytics and property management tools.
+                    <Alert 
+                        severity="info" 
+                        sx={{ 
+                            mb: 4, 
+                            borderRadius: '12px',
+                            border: '1px solid rgba(59, 130, 246, 0.2)',
+                            background: 'rgba(59, 130, 246, 0.05)',
+                        }}
+                    >
+                        <strong>Admin Control Panel:</strong> You are viewing privileged data and system management tools.
                     </Alert>
                 )}
 
-                <Paper sx={{ p: 2, mb: 4 }}>
+                <Paper sx={{ p: 3, mb: 5, borderRadius: '20px' }}>
+                    <Typography variant="h6" sx={{ mb: 3, fontWeight: 600 }}>Market Filters</Typography>
                     <Filters filters={filters} setFilters={setFilters} />
                 </Paper>
 
-                <Grid container spacing={3}>
-                    <Grid size={12}>
-                        <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column', height: 500 }}>
-                            <Typography variant="h6" gutterBottom>Property Map</Typography>
-                            <Box sx={{ flexGrow: 1, minHeight: 0 }}>
+                <Grid container spacing={4}>
+                    <Grid item xs={12}>
+                        <Paper sx={{ 
+                            p: 3, 
+                            height: 600, 
+                            borderRadius: '24px',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            overflow: 'hidden'
+                        }}>
+                            <Typography variant="h5" sx={{ mb: 2, fontWeight: 600 }}>Geospatial Distribution</Typography>
+                            <Box sx={{ flexGrow: 1, minHeight: 0, borderRadius: '16px', overflow: 'hidden' }}>
                                 <Map properties={properties} />
                             </Box>
                         </Paper>
                     </Grid>
 
-                    <Grid size={12}>
+                    <Grid item xs={12}>
                         <Charts filters={debouncedFilters} />
                     </Grid>
 
                     {user?.role === 'Admin' && (
-                        <Grid size={12}>
-                            <Paper sx={{ p: 2 }}>
-                                <Typography variant="h6" gutterBottom>Admin: Region Performance Metrics</Typography>
+                        <Grid item xs={12}>
+                            <Paper sx={{ p: 4, borderRadius: '24px' }}>
+                                <Typography variant="h5" sx={{ mb: 3, fontWeight: 600 }}>Regional Performance Benchmarks</Typography>
                                 <TableContainer>
-                                    <Table size="small">
+                                    <Table>
                                         <TableHead>
                                             <TableRow>
-                                                <TableCell>Region</TableCell>
-                                                <TableCell align="right">Property Count</TableCell>
-                                                <TableCell align="right">Average Price</TableCell>
-                                                <TableCell align="right">Total Volume</TableCell>
+                                                <TableCell sx={{ fontWeight: 700, color: 'text.secondary' }}>REGION</TableCell>
+                                                <TableCell align="right" sx={{ fontWeight: 700, color: 'text.secondary' }}>COUNT</TableCell>
+                                                <TableCell align="right" sx={{ fontWeight: 700, color: 'text.secondary' }}>AVG PRICE</TableCell>
+                                                <TableCell align="right" sx={{ fontWeight: 700, color: 'text.secondary' }}>TOTAL VOLUME</TableCell>
                                             </TableRow>
                                         </TableHead>
                                         <TableBody>
                                             {adminData.map((row) => (
-                                                <TableRow key={row._id}>
-                                                    <TableCell component="th" scope="row">{row._id}</TableCell>
+                                                <TableRow key={row._id} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
+                                                    <TableCell component="th" scope="row" sx={{ fontWeight: 600 }}>
+                                                        {row._id}
+                                                    </TableCell>
                                                     <TableCell align="right">{row.count}</TableCell>
-                                                    <TableCell align="right">
+                                                    <TableCell align="right" sx={{ color: 'primary.light', fontWeight: 600 }}>
                                                         ${row.avgPrice ? row.avgPrice.toLocaleString(undefined, { maximumFractionDigits: 0 }) : 'N/A'}
                                                     </TableCell>
-                                                    <TableCell align="right">
+                                                    <TableCell align="right" sx={{ fontWeight: 600 }}>
                                                         ${row.totalVolume ? row.totalVolume.toLocaleString() : 'N/A'}
                                                     </TableCell>
                                                 </TableRow>
                                             ))}
                                             {adminData.length === 0 && (
                                                 <TableRow>
-                                                    <TableCell colSpan={4} align="center">No data available</TableCell>
+                                                    <TableCell colSpan={4} align="center" sx={{ py: 4, color: 'text.secondary' }}>
+                                                        No performance data found for selected filters
+                                                    </TableCell>
                                                 </TableRow>
                                             )}
                                         </TableBody>

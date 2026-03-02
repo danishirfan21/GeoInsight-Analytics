@@ -6,7 +6,27 @@ import {
 import { Box, Typography, Paper, Grid } from '@mui/material';
 import api from '../api/axios';
 
-const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8'];
+const COLORS = ['#3b82f6', '#8b5cf6', '#10b981', '#f59e0b', '#ef4444'];
+
+const CustomTooltip = ({ active, payload, label }) => {
+    if (active && payload && payload.length) {
+        return (
+            <Box sx={{ 
+                bgcolor: 'rgba(30, 41, 59, 0.9)', 
+                p: 2, 
+                borderRadius: '12px', 
+                border: '1px solid rgba(255,255,255,0.1)',
+                boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.3)'
+            }}>
+                <Typography variant="body2" sx={{ color: 'text.secondary', mb: 0.5 }}>{label}</Typography>
+                <Typography variant="h6" sx={{ color: 'primary.light', fontWeight: 700 }}>
+                    {payload[0].name}: ${Number(payload[0].value).toLocaleString()}
+                </Typography>
+            </Box>
+        );
+    }
+    return null;
+};
 
 export default function Charts({ filters }) {
     const [priceTrends, setPriceTrends] = useState([]);
@@ -22,7 +42,6 @@ export default function Charts({ filters }) {
                     api.get('/analytics/region-distribution', { params: filters })
                 ]);
 
-                // Map data and ensure values are numbers
                 setPriceTrends(trendsRes.data.map(item => ({
                     name: item._id || 'Unknown',
                     avgPrice: Number(item.avgPrice) || 0
@@ -45,77 +64,88 @@ export default function Charts({ filters }) {
     }, [filters]);
 
     return (
-        <Grid container spacing={3} sx={{ mt: 2 }}>
-            <Grid size={{ xs: 12, md: 7 }}>
-                <Paper sx={{ p: 2, height: 400 }}>
-                    <Typography variant="h6" gutterBottom>Price Trends (Avg Price per Month)</Typography>
+        <Grid container spacing={4}>
+            <Grid item xs={12} lg={7}>
+                <Paper sx={{ p: 4, height: 450, borderRadius: '24px' }}>
+                    <Typography variant="h6" sx={{ mb: 4, fontWeight: 600 }}>Market Price Velocity</Typography>
                     {priceTrends.length > 0 ? (
-                        <ResponsiveContainer width="100%" height="90%">
+                        <ResponsiveContainer width="100%" height="85%">
                             <LineChart data={priceTrends}>
-                                <CartesianGrid strokeDasharray="3 3" />
-                                <XAxis dataKey="name" />
-                                <YAxis />
-                                <Tooltip formatter={(value) => `$${Math.round(value).toLocaleString()}`} />
-                                <Legend />
-                                <Line type="monotone" dataKey="avgPrice" stroke="#8884d8" strokeWidth={3} dot={{ r: 4 }} activeDot={{ r: 8 }} name="Avg Price" />
+                                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
+                                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#94a3b8' }} />
+                                <YAxis axisLine={false} tickLine={false} tick={{ fill: '#94a3b8' }} />
+                                <Tooltip content={<CustomTooltip />} />
+                                <Line 
+                                    type="monotone" 
+                                    dataKey="avgPrice" 
+                                    stroke="#3b82f6" 
+                                    strokeWidth={4} 
+                                    dot={{ r: 6, fill: '#3b82f6', strokeWidth: 2, stroke: '#fff' }} 
+                                    activeDot={{ r: 8, strokeWidth: 0 }} 
+                                    name="Avg Price" 
+                                />
                             </LineChart>
                         </ResponsiveContainer>
                     ) : (
-                        <Box display="flex" justifyContent="center" alignItems="center" height="90%">
-                            <Typography color="textSecondary">No data available</Typography>
+                        <Box display="flex" justifyContent="center" alignItems="center" height="85%">
+                            <Typography color="textSecondary">No trend data available</Typography>
                         </Box>
                     )}
                 </Paper>
             </Grid>
-            <Grid size={{ xs: 12, md: 5 }}>
-                <Paper sx={{ p: 2, height: 400 }}>
-                    <Typography variant="h6" gutterBottom>Property Type Distribution</Typography>
+            <Grid item xs={12} lg={5}>
+                <Paper sx={{ p: 4, height: 450, borderRadius: '24px' }}>
+                    <Typography variant="h6" sx={{ mb: 4, fontWeight: 600 }}>Portfolio Composition</Typography>
                     {typeDist.length > 0 ? (
-                        <ResponsiveContainer width="100%" height="90%">
+                        <ResponsiveContainer width="100%" height="85%">
                             <PieChart>
                                 <Pie
                                     data={typeDist}
                                     cx="50%"
-                                    cy="50%"
-                                    innerRadius={60}
-                                    outerRadius={100}
-                                    paddingAngle={5}
+                                    cy="45%"
+                                    innerRadius={80}
+                                    outerRadius={120}
+                                    paddingAngle={8}
                                     dataKey="count"
                                     nameKey="name"
-                                    label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                                    animationBegin={0}
+                                    animationDuration={1500}
                                 >
                                     {typeDist.map((entry, index) => (
-                                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} strokeWidth={0} />
                                     ))}
                                 </Pie>
                                 <Tooltip />
-                                <Legend />
+                                <Legend verticalAlign="bottom" height={36} />
                             </PieChart>
                         </ResponsiveContainer>
                     ) : (
-                        <Box display="flex" justifyContent="center" alignItems="center" height="90%">
-                            <Typography color="textSecondary">No data available</Typography>
+                        <Box display="flex" justifyContent="center" alignItems="center" height="85%">
+                            <Typography color="textSecondary">No composition data</Typography>
                         </Box>
                     )}
                 </Paper>
             </Grid>
-            <Grid size={12}>
-                <Paper sx={{ p: 2, height: 350 }}>
-                    <Typography variant="h6" gutterBottom>Region Comparison (Avg Price)</Typography>
+            <Grid item xs={12}>
+                <Paper sx={{ p: 4, height: 400, borderRadius: '24px' }}>
+                    <Typography variant="h6" sx={{ mb: 4, fontWeight: 600 }}>Regional Valuations (Avg USD)</Typography>
                     {regionDist.length > 0 ? (
-                        <ResponsiveContainer width="100%" height="90%">
-                            <BarChart data={regionDist}>
-                                <CartesianGrid strokeDasharray="3 3" />
-                                <XAxis dataKey="name" />
-                                <YAxis />
-                                <Tooltip formatter={(value) => `$${Math.round(value).toLocaleString()}`} />
-                                <Legend />
-                                <Bar dataKey="avgPrice" fill="#00C49F" name="Avg Price" />
+                        <ResponsiveContainer width="100%" height="85%">
+                            <BarChart data={regionDist} barSize={60}>
+                                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
+                                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#94a3b8' }} />
+                                <YAxis axisLine={false} tickLine={false} tick={{ fill: '#94a3b8' }} />
+                                <Tooltip content={<CustomTooltip />} />
+                                <Bar dataKey="avgPrice" radius={[10, 10, 0, 0]} name="Avg Price">
+                                    {regionDist.map((entry, index) => (
+                                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                    ))}
+                                </Bar>
                             </BarChart>
                         </ResponsiveContainer>
                     ) : (
-                        <Box display="flex" justifyContent="center" alignItems="center" height="90%">
-                            <Typography color="textSecondary">No data available</Typography>
+                        <Box display="flex" justifyContent="center" alignItems="center" height="85%">
+                            <Typography color="textSecondary">No regional data available</Typography>
                         </Box>
                     )}
                 </Paper>
