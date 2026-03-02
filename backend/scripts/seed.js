@@ -30,16 +30,15 @@ const seedData = async () => {
 
     // Seed Properties
     const count = await Property.countDocuments();
-    if (count > 0) {
-        console.log(`Database already contains ${count} properties. Skipping seed.`);
-        return;
-    }
-
     const csvPath = path.join(__dirname, '../data/listings.csv');
-    if (fs.existsSync(csvPath)) {
-        console.log('Real listings data found. Importing...');
-        const results = [];
+    const hasCSV = fs.existsSync(csvPath);
+
+    // Scenario A: Real data found - Force refresh if we only have sample data or nothing
+    if (hasCSV && (count === 0 || count <= 100)) {
+        console.log(`Found listings.csv. Current count: ${count}. Wiping and performing full import...`);
+        await Property.deleteMany({});
         
+        const results = [];
         await new Promise((resolve, reject) => {
             fs.createReadStream(csvPath)
                 .pipe(csv())
@@ -63,14 +62,21 @@ const seedData = async () => {
                 .on('error', reject);
         });
 
-        console.log(`Parsed ${results.length} properties. Inserting in batches...`);
+        console.log(`Successfully parsed ${results.length} real listings. Starting batch insertion...`);
         const batchSize = 1000;
         for (let i = 0; i < results.length; i += batchSize) {
             const batch = results.slice(i, i + batchSize);
             await Property.insertMany(batch);
+            if ((i + batchSize) % 5000 === 0 || (i + batchSize) >= results.length) {
+                console.log(`Progress: ${Math.min(i + batchSize, results.length)} / ${results.length} imported.`);
+            }
         }
-        console.log(`Database seeded with ${results.length} real properties from London`);
-    } else {
+        console.log(`✅ Database fully refreshed with ${results.length} properties from London.`);
+        return;
+    }
+
+    // Scenario B: No real data, No CSV - Seed samples if empty
+    if (count === 0) {
         console.log('No CSV found. Seeding with sample data...');
         const regions = ['North', 'South', 'East', 'West', 'Central'];
         const types = ['Apartment', 'House', 'Condo', 'Townhouse'];
@@ -101,7 +107,10 @@ const seedData = async () => {
 
         await Property.insertMany(properties);
         console.log('Database seeded with 50 sample properties');
+        return;
     }
+
+    console.log(`Database already contains ${count} properties. Skipping seed.`);
 };
 
 module.exports = seedData;

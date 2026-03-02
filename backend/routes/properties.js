@@ -15,9 +15,10 @@ router.get('/', auth, async (req, res) => {
             if (maxPrice) query.price.$lte = Number(maxPrice);
         }
 
-        const properties = await Property.find(query);
+        const properties = await Property.find(query).limit(2000);
         res.json(properties);
     } catch (err) {
+        console.error('Fetch properties error:', err);
         res.status(500).json({ message: 'Server error' });
     }
 });
