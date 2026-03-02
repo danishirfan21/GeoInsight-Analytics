@@ -129,7 +129,7 @@ export default function Dashboard() {
                 </Paper>
 
                 <Grid container spacing={4}>
-                    <Grid item xs={12}>
+                    <Grid size={12}>
                         <Paper sx={{ 
                             p: 3, 
                             height: 600, 
@@ -145,12 +145,12 @@ export default function Dashboard() {
                         </Paper>
                     </Grid>
 
-                    <Grid item xs={12}>
+                    <Grid size={12}>
                         <Charts filters={debouncedFilters} />
                     </Grid>
 
                     {user?.role === 'Admin' && (
-                        <Grid item xs={12}>
+                        <Grid size={12}>
                             <Paper sx={{ p: 4, borderRadius: '24px' }}>
                                 <Typography variant="h5" sx={{ mb: 3, fontWeight: 600 }}>Regional Performance Benchmarks</Typography>
                                 <TableContainer>

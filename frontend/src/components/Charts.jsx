@@ -65,7 +65,7 @@ export default function Charts({ filters }) {
 
     return (
         <Grid container spacing={4}>
-            <Grid item xs={12} lg={7}>
+            <Grid size={{ xs: 12, lg: 7 }}>
                 <Paper sx={{ p: 4, height: 450, borderRadius: '24px' }}>
                     <Typography variant="h6" sx={{ mb: 4, fontWeight: 600 }}>Market Price Velocity</Typography>
                     {priceTrends.length > 0 ? (
@@ -93,7 +93,7 @@ export default function Charts({ filters }) {
                     )}
                 </Paper>
             </Grid>
-            <Grid item xs={12} lg={5}>
+            <Grid size={{ xs: 12, lg: 5 }}>
                 <Paper sx={{ p: 4, height: 450, borderRadius: '24px' }}>
                     <Typography variant="h6" sx={{ mb: 4, fontWeight: 600 }}>Portfolio Composition</Typography>
                     {typeDist.length > 0 ? (
@@ -126,7 +126,7 @@ export default function Charts({ filters }) {
                     )}
                 </Paper>
             </Grid>
-            <Grid item xs={12}>
+            <Grid size={12}>
                 <Paper sx={{ p: 4, height: 400, borderRadius: '24px' }}>
                     <Typography variant="h6" sx={{ mb: 4, fontWeight: 600 }}>Regional Valuations (Avg USD)</Typography>
                     {regionDist.length > 0 ? (

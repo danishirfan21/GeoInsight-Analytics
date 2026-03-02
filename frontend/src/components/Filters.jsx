@@ -9,7 +9,7 @@ export default function Filters({ filters, setFilters }) {
     return (
         <Box sx={{ mb: 2 }}>
             <Grid container spacing={4}>
-                <Grid item xs={12} sm={6} md={3}>
+                <Grid size={{ xs: 12, sm: 6, md: 3 }}>
                     <TextField
                         fullWidth
                         select
@@ -32,7 +32,7 @@ export default function Filters({ filters, setFilters }) {
                         <MenuItem value="Central">Central</MenuItem>
                     </TextField>
                 </Grid>
-                <Grid item xs={12} sm={6} md={3}>
+                <Grid size={{ xs: 12, sm: 6, md: 3 }}>
                     <TextField
                         fullWidth
                         select
@@ -53,7 +53,7 @@ export default function Filters({ filters, setFilters }) {
                         <MenuItem value="Townhouse">Townhouse</MenuItem>
                     </TextField>
                 </Grid>
-                <Grid item xs={12} sm={6} md={3}>
+                <Grid size={{ xs: 12, sm: 6, md: 3 }}>
                     <TextField
                         fullWidth
                         label="Price Floor ($)"
@@ -68,7 +68,7 @@ export default function Filters({ filters, setFilters }) {
                         }}
                     />
                 </Grid>
-                <Grid item xs={12} sm={6} md={3}>
+                <Grid size={{ xs: 12, sm: 6, md: 3 }}>
                     <TextField
                         fullWidth
                         label="Price Ceiling ($)"
