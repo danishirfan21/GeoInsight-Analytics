@@ -30,6 +30,7 @@ export default function Dashboard() {
         maxPrice: ''
     });
     const [debouncedFilters, setDebouncedFilters] = useState(filters);
+    const [isExporting, setIsExporting] = useState(false);
 
     const debouncedSetFilters = useCallback(
         debounce((newFilters) => {
@@ -41,6 +42,29 @@ export default function Dashboard() {
     useEffect(() => {
         debouncedSetFilters(filters);
     }, [filters, debouncedSetFilters]);
+
+    const handleExport = async () => {
+        setIsExporting(true);
+        try {
+            const response = await api.get('/properties/export', {
+                params: filters,
+                responseType: 'blob',
+            });
+
+            const url = window.URL.createObjectURL(new Blob([response.data]));
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', `geoinsight_export_${new Date().toISOString().split('T')[0]}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            window.URL.revokeObjectURL(url);
+        } catch (err) {
+            console.error('Export failed', err);
+        } finally {
+            setIsExporting(false);
+        }
+    };
 
     useEffect(() => {
         const fetchProperties = async () => {
@@ -224,7 +248,15 @@ export default function Dashboard() {
                                         <Typography variant="h5" sx={{ fontWeight: 800, mb: 0.5 }}>Regional Performance</Typography>
                                         <Typography variant="body2" color="text.secondary">Comparative analysis of key market metrics by region</Typography>
                                     </Box>
-                                    <Button size="small" variant="outlined" sx={{ borderRadius: '10px' }}>Export Data</Button>
+                                    <Button
+                                        size="small"
+                                        variant="outlined"
+                                        sx={{ borderRadius: '10px' }}
+                                        onClick={handleExport}
+                                        disabled={isExporting}
+                                    >
+                                        {isExporting ? 'Exporting...' : 'Export Data'}
+                                    </Button>
                                 </Box>
                                 <TableContainer>
                                     <Table>
