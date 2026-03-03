@@ -54,6 +54,7 @@ const seedData = async () => {
                                 lng: parseFloat(data.longitude)
                             },
                             description: `A ${data.room_type} located in ${data.neighbourhood}. Host: ${data.host_name}.`,
+                            listingDate: new Date(Date.now() - Math.floor(Math.random() * 31536000000)), // Random date in last year
                             amenities: ['Wifi', 'Kitchen', 'Heating'].slice(0, Math.floor(Math.random() * 3) + 1)
                         });
                     }

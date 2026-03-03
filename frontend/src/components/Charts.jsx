@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import {
-    LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip,
+    LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend,
     ResponsiveContainer, PieChart, Pie, Cell, AreaChart, Area
 } from 'recharts';
 import { Box, Typography, Paper, Grid, Skeleton } from '@mui/material';
@@ -10,20 +10,39 @@ const COLORS = ['#6366f1', '#10b981', '#f59e0b', '#ec4899', '#8b5cf6'];
 
 const CustomTooltip = ({ active, payload, label }) => {
     if (active && payload && payload.length) {
+        const isPrice = payload[0].name === 'Avg Price';
+        const value = payload[0].value;
+        const color = payload[0].payload.fill || payload[0].color || '#6366f1';
+        
         return (
             <Box sx={{ 
-                bgcolor: 'rgba(15, 23, 42, 0.95)',
+                bgcolor: 'rgba(2, 6, 23, 0.95)',
                 p: 2, 
-                borderRadius: '12px', 
-                border: '1px solid rgba(255,255,255,0.12)',
-                boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.5)',
-                backdropFilter: 'blur(10px)'
+                borderRadius: '16px', 
+                border: '1px solid rgba(255,255,255,0.1)',
+                boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+                backdropFilter: 'blur(12px)',
+                minWidth: '160px'
             }}>
-                <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600, display: 'block', mb: 0.5 }}>
-                    {label}
+                <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+                    {!isPrice && (
+                        <Box sx={{ 
+                            width: 10, 
+                            height: 10, 
+                            borderRadius: '50%', 
+                            bgcolor: color, 
+                            mr: 1 
+                        }} />
+                    )}
+                    <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.6)', fontWeight: 600, letterSpacing: '0.05em', textTransform: 'uppercase' }}>
+                        {payload[0].payload.name || label}
+                    </Typography>
+                </Box>
+                <Typography variant="h6" sx={{ color: '#fff', fontWeight: 800, fontSize: '1.1rem' }}>
+                    {isPrice ? `$${Number(value).toLocaleString()}` : Number(value).toLocaleString()}
                 </Typography>
-                <Typography variant="body1" sx={{ color: 'primary.light', fontWeight: 800 }}>
-                    {payload[0].name}: ${Number(payload[0].value).toLocaleString()}
+                <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.4)', fontWeight: 500 }}>
+                    {isPrice ? 'Average Listing Price' : 'Total Properties'}
                 </Typography>
             </Box>
         );
@@ -145,7 +164,13 @@ export default function Charts({ filters, layout }) {
                                         <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                                     ))}
                                 </Pie>
-                                <Tooltip />
+                                <Tooltip content={<CustomTooltip />} />
+                                <Legend 
+                                    verticalAlign="bottom" 
+                                    height={36} 
+                                    iconType="circle"
+                                    formatter={(value) => <span style={{ color: 'rgba(255,255,255,0.7)', fontSize: '12px', fontWeight: 500 }}>{value}</span>}
+                                />
                             </PieChart>
                         </ResponsiveContainer>
                     ) : (
