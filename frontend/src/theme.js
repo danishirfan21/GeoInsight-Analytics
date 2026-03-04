@@ -59,17 +59,18 @@ const theme = createTheme({
           '&::-webkit-scrollbar-thumb:hover, & *::-webkit-scrollbar-thumb:hover': {
             backgroundColor: '#475569',
           },
-          // Fix for browser autofill background
+          // Fix for browser autofill background and text alignment
           'input:-webkit-autofill': {
             WebkitBoxShadow: '0 0 0 100px #0f172a inset !important',
             WebkitTextFillColor: '#f8fafc !important',
             caretColor: '#f8fafc',
+            transition: 'background-color 5000s ease-in-out 0s !important',
           },
           'input:-webkit-autofill:hover': {
             WebkitBoxShadow: '0 0 0 100px #0f172a inset !important',
           },
           'input:-webkit-autofill:focus': {
-            WebkitBoxShadow: '0 0 0 100px #0f172a inset !important',
+            WebkitBoxShadow: '0 0 0 100px #1e293b inset !important',
           },
           'input:-webkit-autofill:active': {
             WebkitBoxShadow: '0 0 0 100px #0f172a inset !important',
@@ -149,6 +150,9 @@ const theme = createTheme({
               color: '#94a3b8',
               opacity: 1,
             },
+            '&.MuiInputBase-inputAdornedStart': {
+              paddingLeft: '14px',
+            },
           },
           '& .MuiInputLabel-root': {
             color: '#94a3b8',
@@ -160,6 +164,7 @@ const theme = createTheme({
             borderRadius: 12,
             transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
             backgroundColor: 'rgba(15, 23, 42, 0.5)',
+            overflow: 'hidden', // Prevents autofill/inner background from bleeding out of corners
             '& fieldset': {
               borderColor: 'rgba(255, 255, 255, 0.1)',
             },
